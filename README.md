@@ -120,11 +120,22 @@
   </tbody>
 </table>
 
-## Install
+## Local Development
+When testing out changes in your local Trainual project, run the following command prior to starting development:
 ```
-npm install @dabeng/react-orgchart
+npm run development:link
 ```
 
-### `npm run build` fails to minify
+After changes are made, run to update `dist/`:
+```
+npm run publish
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+Make sure to `unlink` the repository with:
+```
+npm run development:unlink
+```
+
+## Publishing
+Prior to submitting a pull request, run `npm run publish`. This will update the `dist/` to include your updated changes.
+Once your PR is approved and merged to master, if you are ready to publish a new version, use Github tags: https://github.com/trainual/react-orgchart/tags

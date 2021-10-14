@@ -59,7 +59,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "publish": "rm -rf dist && mkdir dist && babel src/components -d dist --copy-files"
+    "publish": "rm -rf dist && mkdir dist && babel src/components -d dist --copy-files",
+    "development:link": "yarn link && cd node_modules/react && yarn link && cd ../../node_modules/react-dom && yarn link",
+    "development:unlink": "yarn unlink && cd node_modules/react && yarn unlink && cd ../../node_modules/react-dom && yarn unlink"
   },
   "eslintConfig": {
     "extends": "react-app"
