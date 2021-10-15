@@ -121,7 +121,14 @@
 </table>
 
 ## Local Development
-When testing out changes in your local Trainual project, run the following command prior to starting development:
+
+### Within trainual/react-orgchart
+Clone this repository:
+```
+git clone git@github.com:trainual/react-orgchart.git
+```
+
+When testing out changes in your local Trainual project, run the following command prior to starting development (see below instructions for linking Trainual repository):
 ```
 npm run development:link
 ```
@@ -131,10 +138,24 @@ After changes are made, run to update `dist/`:
 npm run publish
 ```
 
-Make sure to `unlink` the repository with:
+When you are no longer developing locally make sure to `unlink` the repository with**:
 ```
 npm run development:unlink
 ```
+
+### Within [trainual](https://github.com/trainual/trainual)
+
+Link local `trainual/react-orgchart`:
+```
+yarn run orgchart:link
+```
+
+When you are no longer developing locally make sure to `unlink` the repository with**:
+```
+yarn run orgchart:unlink
+```
+
+**Save these steps for the end and you are done developing locally
 
 ## Publishing
 Prior to submitting a pull request, run `npm run publish`. This will update the `dist/` to include your updated changes.
