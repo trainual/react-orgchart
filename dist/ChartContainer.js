@@ -23,6 +23,8 @@ var _ChartNode = _interopRequireDefault(require("./ChartNode"));
 
 require("./ChartContainer.css");
 
+var _reactZoomPanPinch = require("react-zoom-pan-pinch");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
@@ -55,8 +57,6 @@ var propTypes = {
   datasource: _propTypes.default.object.isRequired,
   pan: _propTypes.default.bool,
   zoom: _propTypes.default.bool,
-  zoomoutLimit: _propTypes.default.number,
-  zoominLimit: _propTypes.default.number,
   containerClass: _propTypes.default.string,
   chartClass: _propTypes.default.string,
   NodeTemplate: _propTypes.default.elementType,
@@ -69,8 +69,6 @@ var propTypes = {
 var defaultProps = {
   pan: false,
   zoom: false,
-  zoomoutLimit: 0.5,
-  zoominLimit: 7,
   containerClass: "",
   chartClass: "",
   draggable: false,
@@ -81,8 +79,6 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   var datasource = _ref.datasource,
       pan = _ref.pan,
       zoom = _ref.zoom,
-      zoomoutLimit = _ref.zoomoutLimit,
-      zoominLimit = _ref.zoominLimit,
       containerClass = _ref.containerClass,
       chartClass = _ref.chartClass,
       NodeTemplate = _ref.NodeTemplate,
@@ -246,40 +242,6 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     }
   };
 
-  var updateChartScale = function updateChartScale(newScale) {
-    var matrix = [];
-    var targetScale = 1;
-
-    if (transform === "") {
-      setTransform("matrix(" + newScale + ", 0, 0, " + newScale + ", 0, 0)");
-    } else {
-      matrix = transform.split(",");
-
-      if (transform.indexOf("3d") === -1) {
-        targetScale = Math.abs(window.parseFloat(matrix[3]) * newScale);
-
-        if (targetScale > zoomoutLimit && targetScale < zoominLimit) {
-          matrix[0] = "matrix(" + targetScale;
-          matrix[3] = targetScale;
-          setTransform(matrix.join(","));
-        }
-      } else {
-        targetScale = Math.abs(window.parseFloat(matrix[5]) * newScale);
-
-        if (targetScale > zoomoutLimit && targetScale < zoominLimit) {
-          matrix[0] = "matrix3d(" + targetScale;
-          matrix[5] = targetScale;
-          setTransform(matrix.join(","));
-        }
-      }
-    }
-  };
-
-  var zoomHandler = function zoomHandler(e) {
-    var newScale = 1 + (e.deltaY > 0 ? -0.2 : 0.2);
-    updateChartScale(newScale);
-  };
-
   var exportPDF = function exportPDF(canvas, exportFilename) {
     var canvasWidth = Math.floor(canvas.width);
     var canvasHeight = Math.floor(canvas.height);
@@ -379,10 +341,22 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       }
     };
   });
-  return /*#__PURE__*/_react.default.createElement("div", {
+
+  var ZoomWrapper = function ZoomWrapper(_ref3) {
+    var children = _ref3.children,
+        condition = _ref3.condition,
+        wrapper = _ref3.wrapper;
+    return condition ? wrapper(children) : children;
+  };
+
+  return /*#__PURE__*/_react.default.createElement(ZoomWrapper, {
+    condition: zoom,
+    wrapper: function wrapper(children) {
+      return /*#__PURE__*/_react.default.createElement(_reactZoomPanPinch.TransformWrapper, null, /*#__PURE__*/_react.default.createElement(_reactZoomPanPinch.TransformComponent, null, children));
+    }
+  }, /*#__PURE__*/_react.default.createElement("div", {
     ref: container,
     className: "orgchart-container " + containerClass,
-    onWheel: zoom ? zoomHandler : undefined,
     onMouseUp: pan && panning ? panEndHandler : undefined
   }, /*#__PURE__*/_react.default.createElement("div", {
     ref: chart,
@@ -411,7 +385,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     className: "oc-mask ".concat(exporting ? "" : "hidden")
   }, /*#__PURE__*/_react.default.createElement("i", {
     className: "oci oci-spinner spinner"
-  })));
+  }))));
 });
 ChartContainer.propTypes = propTypes;
 ChartContainer.defaultProps = defaultProps;

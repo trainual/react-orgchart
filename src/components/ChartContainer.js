@@ -12,6 +12,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import ChartNode from "./ChartNode";
 import "./ChartContainer.css";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 const propTypes = {
   datasource: PropTypes.object.isRequired,
@@ -43,8 +44,6 @@ const ChartContainer = forwardRef(
       datasource,
       pan,
       zoom,
-      zoomoutLimit,
-      zoominLimit,
       containerClass,
       chartClass,
       NodeTemplate,
@@ -260,44 +259,49 @@ const ChartContainer = forwardRef(
       }
     }));
 
+    const ZoomWrapper = ({ children, condition, wrapper }) =>
+      condition ? wrapper(children) : children
+
     return (
-      <div
-        ref={container}
-        className={"orgchart-container " + containerClass}
-        onMouseUp={pan && panning ? panEndHandler : undefined}
-      >
+      <ZoomWrapper condition={zoom} wrapper={children => <TransformWrapper><TransformComponent>{children}</TransformComponent></TransformWrapper>}>
         <div
-          ref={chart}
-          className={"orgchart " + chartClass}
-          style={{ transform: transform, cursor: cursor }}
-          onClick={clickChartHandler}
-          onMouseDown={pan ? panStartHandler : undefined}
-          onMouseMove={pan && panning ? panHandler : undefined}
+          ref={container}
+          className={"orgchart-container " + containerClass}
+          onMouseUp={pan && panning ? panEndHandler : undefined}
         >
-          <ul>
-            <ChartNode
-              datasource={attachRel(ds, "00")}
-              NodeTemplate={NodeTemplate}
-              draggable={draggable}
-              collapsible={collapsible}
-              multipleSelect={multipleSelect}
-              changeHierarchy={changeHierarchy}
-              onClickNode={onClickNode}
-            />
-          </ul>
+          <div
+            ref={chart}
+            className={"orgchart " + chartClass}
+            style={{ transform: transform, cursor: cursor }}
+            onClick={clickChartHandler}
+            onMouseDown={pan ? panStartHandler : undefined}
+            onMouseMove={pan && panning ? panHandler : undefined}
+          >
+            <ul>
+              <ChartNode
+                datasource={attachRel(ds, "00")}
+                NodeTemplate={NodeTemplate}
+                draggable={draggable}
+                collapsible={collapsible}
+                multipleSelect={multipleSelect}
+                changeHierarchy={changeHierarchy}
+                onClickNode={onClickNode}
+              />
+            </ul>
+          </div>
+          <a
+            className="oc-download-btn hidden"
+            ref={downloadButton}
+            href={dataURL}
+            download={download}
+          >
+            &nbsp;
+          </a>
+          <div className={`oc-mask ${exporting ? "" : "hidden"}`}>
+            <i className="oci oci-spinner spinner"></i>
+          </div>
         </div>
-        <a
-          className="oc-download-btn hidden"
-          ref={downloadButton}
-          href={dataURL}
-          download={download}
-        >
-          &nbsp;
-        </a>
-        <div className={`oc-mask ${exporting ? "" : "hidden"}`}>
-          <i className="oci oci-spinner spinner"></i>
-        </div>
-      </div>
+      </ZoomWrapper>
     );
   }
 );
