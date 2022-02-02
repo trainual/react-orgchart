@@ -85,18 +85,6 @@
       <td>false</td>
       <td>If true, the chart can be zoomed.</td>
     </tr>
-    <tr>
-      <td>zoominLimit</td>
-      <td>number</td>
-      <td>7</td>
-      <td>User can zoom the chart at different scales(0.5~7).</td>
-    </tr>
-    <tr>
-      <td>zoomoutLimit</td>
-      <td>number</td>
-      <td>0.5</td>
-      <td>User can zoom the chart at different scales(0.5~7).</td>
-    </tr>
   </tbody>
 </table>
 

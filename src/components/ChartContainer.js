@@ -17,8 +17,6 @@ const propTypes = {
   datasource: PropTypes.object.isRequired,
   pan: PropTypes.bool,
   zoom: PropTypes.bool,
-  zoomoutLimit: PropTypes.number,
-  zoominLimit: PropTypes.number,
   containerClass: PropTypes.string,
   chartClass: PropTypes.string,
   NodeTemplate: PropTypes.elementType,
@@ -32,8 +30,6 @@ const propTypes = {
 const defaultProps = {
   pan: false,
   zoom: false,
-  zoomoutLimit: 0.5,
-  zoominLimit: 7,
   containerClass: "",
   chartClass: "",
   draggable: false,
@@ -173,36 +169,6 @@ const ChartContainer = forwardRef(
       }
     };
 
-    const updateChartScale = newScale => {
-      let matrix = [];
-      let targetScale = 1;
-      if (transform === "") {
-        setTransform("matrix(" + newScale + ", 0, 0, " + newScale + ", 0, 0)");
-      } else {
-        matrix = transform.split(",");
-        if (transform.indexOf("3d") === -1) {
-          targetScale = Math.abs(window.parseFloat(matrix[3]) * newScale);
-          if (targetScale > zoomoutLimit && targetScale < zoominLimit) {
-            matrix[0] = "matrix(" + targetScale;
-            matrix[3] = targetScale;
-            setTransform(matrix.join(","));
-          }
-        } else {
-          targetScale = Math.abs(window.parseFloat(matrix[5]) * newScale);
-          if (targetScale > zoomoutLimit && targetScale < zoominLimit) {
-            matrix[0] = "matrix3d(" + targetScale;
-            matrix[5] = targetScale;
-            setTransform(matrix.join(","));
-          }
-        }
-      }
-    };
-
-    const zoomHandler = e => {
-      let newScale = 1 + (e.deltaY > 0 ? -0.2 : 0.2);
-      updateChartScale(newScale);
-    };
-
     const exportPDF = (canvas, exportFilename) => {
       const canvasWidth = Math.floor(canvas.width);
       const canvasHeight = Math.floor(canvas.height);
@@ -298,7 +264,6 @@ const ChartContainer = forwardRef(
       <div
         ref={container}
         className={"orgchart-container " + containerClass}
-        onWheel={zoom ? zoomHandler : undefined}
         onMouseUp={pan && panning ? panEndHandler : undefined}
       >
         <div
