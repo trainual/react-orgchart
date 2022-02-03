@@ -56,7 +56,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 var propTypes = {
   datasource: _propTypes.default.object.isRequired,
   pan: _propTypes.default.bool,
-  zoom: _propTypes.default.bool,
+  zoom: _propTypes.default.object,
   containerClass: _propTypes.default.string,
   chartClass: _propTypes.default.string,
   NodeTemplate: _propTypes.default.elementType,
@@ -68,7 +68,6 @@ var propTypes = {
 };
 var defaultProps = {
   pan: false,
-  zoom: false,
   containerClass: "",
   chartClass: "",
   draggable: false,
@@ -90,6 +89,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   var container = (0, _react.useRef)();
   var chart = (0, _react.useRef)();
   var downloadButton = (0, _react.useRef)();
+  var transformComponentRef = (0, _react.useRef)(null);
 
   var _useState = (0, _react.useState)(0),
       _useState2 = _slicedToArray(_useState, 2),
@@ -130,6 +130,20 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       _useState16 = _slicedToArray(_useState15, 2),
       download = _useState16[0],
       setDownload = _useState16[1];
+
+  (0, _react.useEffect)(function () {
+    updateScale(zoom);
+  }, [zoom]);
+
+  var updateScale = function updateScale(zoom) {
+    if (!transformComponentRef.current) {
+      return;
+    }
+
+    var centerView = transformComponentRef.current.centerView;
+    var value = zoom.value;
+    centerView(value, 700, 'easeOut');
+  };
 
   var attachRel = function attachRel(data, flags) {
     data.relationship = flags + (data.children && data.children.length > 0 ? 1 : 0);
@@ -341,18 +355,31 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       }
     };
   });
-
-  var ZoomWrapper = function ZoomWrapper(_ref3) {
-    var children = _ref3.children,
-        condition = _ref3.condition,
-        wrapper = _ref3.wrapper;
-    return condition ? wrapper(children) : children;
-  };
-
-  return /*#__PURE__*/_react.default.createElement(ZoomWrapper, {
-    condition: zoom,
-    wrapper: function wrapper(children) {
-      return /*#__PURE__*/_react.default.createElement(_reactZoomPanPinch.TransformWrapper, null, /*#__PURE__*/_react.default.createElement(_reactZoomPanPinch.TransformComponent, null, children));
+  return /*#__PURE__*/_react.default.createElement(_reactZoomPanPinch.TransformWrapper, {
+    initialScale: 1,
+    ref: transformComponentRef,
+    disabled: !!!zoom,
+    minScale: zoom && zoom.minZoom,
+    maxScale: zoom && zoom.maxZoom,
+    doubleClick: {
+      disabled: true
+    },
+    wheel: {
+      disabled: true
+    },
+    panning: {
+      disabled: true
+    }
+  }, /*#__PURE__*/_react.default.createElement(_reactZoomPanPinch.TransformComponent, {
+    wrapperClass: "transform-wrapper",
+    contentClass: "transform-content",
+    wrapperStyle: {
+      minWidth: "100%",
+      maxHeight: "calc(100vh - 50px)"
+    },
+    contentStyle: {
+      minWidth: "100%",
+      display: "block"
     }
   }, /*#__PURE__*/_react.default.createElement("div", {
     ref: container,
@@ -385,7 +412,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     className: "oc-mask ".concat(exporting ? "" : "hidden")
   }, /*#__PURE__*/_react.default.createElement("i", {
     className: "oci oci-spinner spinner"
-  }))));
+  })))));
 });
 ChartContainer.propTypes = propTypes;
 ChartContainer.defaultProps = defaultProps;

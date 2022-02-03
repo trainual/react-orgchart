@@ -17,7 +17,7 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 const propTypes = {
   datasource: PropTypes.object.isRequired,
   pan: PropTypes.bool,
-  zoom: PropTypes.bool,
+  zoom: PropTypes.object,
   containerClass: PropTypes.string,
   chartClass: PropTypes.string,
   NodeTemplate: PropTypes.elementType,
@@ -30,7 +30,6 @@ const propTypes = {
 
 const defaultProps = {
   pan: false,
-  zoom: false,
   containerClass: "",
   chartClass: "",
   draggable: false,
@@ -58,6 +57,7 @@ const ChartContainer = forwardRef(
     const container = useRef();
     const chart = useRef();
     const downloadButton = useRef();
+    const transformComponentRef = useRef(null);
 
     const [startX, setStartX] = useState(0);
     const [startY, setStartY] = useState(0);
@@ -67,6 +67,21 @@ const ChartContainer = forwardRef(
     const [exporting, setExporting] = useState(false);
     const [dataURL, setDataURL] = useState("");
     const [download, setDownload] = useState("");
+
+    useEffect(() => {
+      updateScale(zoom);
+    }, [zoom]);
+
+    const updateScale = (zoom) => {
+      if (!transformComponentRef.current) {
+        return;
+      }
+
+      const { centerView } = transformComponentRef.current;
+      const { value } = zoom;
+
+      centerView(value, 700, 'easeOut')
+    }
 
     const attachRel = (data, flags) => {
       data.relationship =
@@ -259,49 +274,74 @@ const ChartContainer = forwardRef(
       }
     }));
 
-    const ZoomWrapper = ({ children, condition, wrapper }) =>
-      condition ? wrapper(children) : children
-
     return (
-      <ZoomWrapper condition={zoom} wrapper={children => <TransformWrapper><TransformComponent>{children}</TransformComponent></TransformWrapper>}>
-        <div
-          ref={container}
-          className={"orgchart-container " + containerClass}
-          onMouseUp={pan && panning ? panEndHandler : undefined}
+      <TransformWrapper
+        initialScale={1}
+        ref={transformComponentRef}
+        disabled={!(!!zoom)}
+        minScale={zoom && zoom.minZoom}
+        maxScale={zoom && zoom.maxZoom}
+        doubleClick={{
+          disabled: true
+        }}
+        wheel={{
+          disabled: true
+        }}
+        panning={{
+          disabled: true
+        }}
+      >
+        <TransformComponent
+          wrapperClass="transform-wrapper"
+          contentClass="transform-content"
+          wrapperStyle={{
+            minWidth: "100%",
+            maxHeight: "calc(100vh - 50px)",
+          }}
+          contentStyle={{
+            minWidth: "100%",
+            display: "block",
+          }}
         >
           <div
-            ref={chart}
-            className={"orgchart " + chartClass}
-            style={{ transform: transform, cursor: cursor }}
-            onClick={clickChartHandler}
-            onMouseDown={pan ? panStartHandler : undefined}
-            onMouseMove={pan && panning ? panHandler : undefined}
+            ref={container}
+            className={"orgchart-container " + containerClass}
+            onMouseUp={pan && panning ? panEndHandler : undefined}
           >
-            <ul>
-              <ChartNode
-                datasource={attachRel(ds, "00")}
-                NodeTemplate={NodeTemplate}
-                draggable={draggable}
-                collapsible={collapsible}
-                multipleSelect={multipleSelect}
-                changeHierarchy={changeHierarchy}
-                onClickNode={onClickNode}
-              />
-            </ul>
+            <div
+              ref={chart}
+              className={"orgchart " + chartClass}
+              style={{ transform: transform, cursor: cursor }}
+              onClick={clickChartHandler}
+              onMouseDown={pan ? panStartHandler : undefined}
+              onMouseMove={pan && panning ? panHandler : undefined}
+            >
+              <ul>
+                <ChartNode
+                  datasource={attachRel(ds, "00")}
+                  NodeTemplate={NodeTemplate}
+                  draggable={draggable}
+                  collapsible={collapsible}
+                  multipleSelect={multipleSelect}
+                  changeHierarchy={changeHierarchy}
+                  onClickNode={onClickNode}
+                />
+              </ul>
+            </div>
+            <a
+              className="oc-download-btn hidden"
+              ref={downloadButton}
+              href={dataURL}
+              download={download}
+            >
+              &nbsp;
+            </a>
+            <div className={`oc-mask ${exporting ? "" : "hidden"}`}>
+              <i className="oci oci-spinner spinner"></i>
+            </div>
           </div>
-          <a
-            className="oc-download-btn hidden"
-            ref={downloadButton}
-            href={dataURL}
-            download={download}
-          >
-            &nbsp;
-          </a>
-          <div className={`oc-mask ${exporting ? "" : "hidden"}`}>
-            <i className="oci oci-spinner spinner"></i>
-          </div>
-        </div>
-      </ZoomWrapper>
+        </TransformComponent>
+      </TransformWrapper>
     );
   }
 );
