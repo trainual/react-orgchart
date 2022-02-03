@@ -81,9 +81,9 @@
     </tr>
     <tr>
       <td>zoom</td>
-      <td>boolean</td>
-      <td>false</td>
-      <td>If true, the chart can be zoomed.</td>
+      <td>object</td>
+      <td></td>
+      <td>ZoomState object and if set, the chart can be zoomed.</td>
     </tr>
   </tbody>
 </table>
@@ -115,7 +115,7 @@ Clone this repository:
 git clone git@github.com:trainual/react-orgchart.git
 ```
 
-###Install [yalc](https://github.com/wclr/yalc):
+### Install [yalc](https://github.com/wclr/yalc):
 
 Using NPM:
 ```
