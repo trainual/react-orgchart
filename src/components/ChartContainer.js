@@ -80,7 +80,7 @@ const ChartContainer = forwardRef(
       const { centerView } = transformComponentRef.current;
       const { value } = zoom;
 
-      centerView(value, 700, 'easeOut')
+      centerView(value, 300, 'easeOut')
     }
 
     const attachRel = (data, flags) => {
