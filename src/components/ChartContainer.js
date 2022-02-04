@@ -17,7 +17,7 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 const propTypes = {
   datasource: PropTypes.object.isRequired,
   pan: PropTypes.bool,
-  zoom: PropTypes.object,
+  zoom: PropTypes.shape({ minZoom: PropTypes.number, maxZoom: PropTypes.number, value: PropTypes.number, }),
   containerClass: PropTypes.string,
   chartClass: PropTypes.string,
   NodeTemplate: PropTypes.elementType,
@@ -296,7 +296,6 @@ const ChartContainer = forwardRef(
           contentClass="transform-content"
           wrapperStyle={{
             minWidth: "100%",
-            maxHeight: "calc(100vh - 50px)",
           }}
           contentStyle={{
             minWidth: "100%",

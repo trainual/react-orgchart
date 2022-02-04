@@ -56,7 +56,11 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 var propTypes = {
   datasource: _propTypes.default.object.isRequired,
   pan: _propTypes.default.bool,
-  zoom: _propTypes.default.object,
+  zoom: _propTypes.default.shape({
+    minZoom: _propTypes.default.number,
+    maxZoom: _propTypes.default.number,
+    value: _propTypes.default.number
+  }),
   containerClass: _propTypes.default.string,
   chartClass: _propTypes.default.string,
   NodeTemplate: _propTypes.default.elementType,
@@ -142,7 +146,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
 
     var centerView = transformComponentRef.current.centerView;
     var value = zoom.value;
-    centerView(value, 700, 'easeOut');
+    centerView(value, 300, 'easeOut');
   };
 
   var attachRel = function attachRel(data, flags) {
@@ -374,8 +378,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     wrapperClass: "transform-wrapper",
     contentClass: "transform-content",
     wrapperStyle: {
-      minWidth: "100%",
-      maxHeight: "calc(100vh - 50px)"
+      minWidth: "100%"
     },
     contentStyle: {
       minWidth: "100%",
