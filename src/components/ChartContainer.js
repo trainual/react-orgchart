@@ -59,10 +59,6 @@ const ChartContainer = forwardRef(
     const downloadButton = useRef();
     const transformComponentRef = useRef(null);
 
-    const [startX, setStartX] = useState(0);
-    const [startY, setStartY] = useState(0);
-    const [transform, setTransform] = useState("");
-    const [panning, setPanning] = useState(false);
     const [cursor, setCursor] = useState("default");
     const [exporting, setExporting] = useState(false);
     const [dataURL, setDataURL] = useState("");
@@ -71,6 +67,12 @@ const ChartContainer = forwardRef(
     useEffect(() => {
       updateScale(zoom);
     }, [zoom]);
+
+    useEffect(() => {
+      if (pan) {
+        setCursor("move");
+      }
+    }, [pan]);
 
     const updateScale = (zoom) => {
       if (!transformComponentRef.current) {
@@ -107,79 +109,6 @@ const ChartContainer = forwardRef(
           onClickChart();
         }
         selectNodeService.clearSelectedNodeInfo();
-      }
-    };
-
-    const panEndHandler = () => {
-      setPanning(false);
-      setCursor("default");
-    };
-
-    const panHandler = e => {
-      let newX = 0;
-      let newY = 0;
-      if (!e.targetTouches) {
-        // pand on desktop
-        newX = e.pageX - startX;
-        newY = e.pageY - startY;
-      } else if (e.targetTouches.length === 1) {
-        // pan on mobile device
-        newX = e.targetTouches[0].pageX - startX;
-        newY = e.targetTouches[0].pageY - startY;
-      } else if (e.targetTouches.length > 1) {
-        return;
-      }
-      if (transform === "") {
-        if (transform.indexOf("3d") === -1) {
-          setTransform("matrix(1,0,0,1," + newX + "," + newY + ")");
-        } else {
-          setTransform(
-            "matrix3d(1,0,0,0,0,1,0,0,0,0,1,0," + newX + ", " + newY + ",0,1)"
-          );
-        }
-      } else {
-        let matrix = transform.split(",");
-        if (transform.indexOf("3d") === -1) {
-          matrix[4] = newX;
-          matrix[5] = newY + ")";
-        } else {
-          matrix[12] = newX;
-          matrix[13] = newY;
-        }
-        setTransform(matrix.join(","));
-      }
-    };
-
-    const panStartHandler = e => {
-      if (e.target.closest(".oc-node")) {
-        setPanning(false);
-        return;
-      } else {
-        setPanning(true);
-        setCursor("move");
-      }
-      let lastX = 0;
-      let lastY = 0;
-      if (transform !== "") {
-        let matrix = transform.split(",");
-        if (transform.indexOf("3d") === -1) {
-          lastX = parseInt(matrix[4]);
-          lastY = parseInt(matrix[5]);
-        } else {
-          lastX = parseInt(matrix[12]);
-          lastY = parseInt(matrix[13]);
-        }
-      }
-      if (!e.targetTouches) {
-        // pand on desktop
-        setStartX(e.pageX - lastX);
-        setStartY(e.pageY - lastY);
-      } else if (e.targetTouches.length === 1) {
-        // pan on mobile device
-        setStartX(e.targetTouches[0].pageX - lastX);
-        setStartY(e.targetTouches[0].pageY - lastY);
-      } else if (e.targetTouches.length > 1) {
-        return;
       }
     };
 
@@ -281,6 +210,7 @@ const ChartContainer = forwardRef(
         disabled={!(!!zoom)}
         minScale={zoom && zoom.minZoom}
         maxScale={zoom && zoom.maxZoom}
+        limitToBounds={false}
         doubleClick={{
           disabled: true
         }}
@@ -288,7 +218,7 @@ const ChartContainer = forwardRef(
           disabled: true
         }}
         panning={{
-          disabled: true
+          disabled: !pan
         }}
       >
         <TransformComponent
@@ -302,18 +232,12 @@ const ChartContainer = forwardRef(
             display: "block",
           }}
         >
-          <div
-            ref={container}
-            className={"orgchart-container " + containerClass}
-            onMouseUp={pan && panning ? panEndHandler : undefined}
-          >
+          <div ref={container} className={"orgchart-container " + containerClass}>
             <div
               ref={chart}
               className={"orgchart " + chartClass}
-              style={{ transform: transform, cursor: cursor }}
+              style={{ cursor: cursor }}
               onClick={clickChartHandler}
-              onMouseDown={pan ? panStartHandler : undefined}
-              onMouseMove={pan && panning ? panHandler : undefined}
             >
               <ul>
                 <ChartNode
@@ -336,7 +260,7 @@ const ChartContainer = forwardRef(
               &nbsp;
             </a>
             <div className={`oc-mask ${exporting ? "" : "hidden"}`}>
-              <i className="oci oci-spinner spinner"></i>
+              <i className="oci oci-spinner spinner"/>
             </div>
           </div>
         </TransformComponent>

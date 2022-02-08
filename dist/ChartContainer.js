@@ -95,49 +95,34 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   var downloadButton = (0, _react.useRef)();
   var transformComponentRef = (0, _react.useRef)(null);
 
-  var _useState = (0, _react.useState)(0),
+  var _useState = (0, _react.useState)("default"),
       _useState2 = _slicedToArray(_useState, 2),
-      startX = _useState2[0],
-      setStartX = _useState2[1];
+      cursor = _useState2[0],
+      setCursor = _useState2[1];
 
-  var _useState3 = (0, _react.useState)(0),
+  var _useState3 = (0, _react.useState)(false),
       _useState4 = _slicedToArray(_useState3, 2),
-      startY = _useState4[0],
-      setStartY = _useState4[1];
+      exporting = _useState4[0],
+      setExporting = _useState4[1];
 
   var _useState5 = (0, _react.useState)(""),
       _useState6 = _slicedToArray(_useState5, 2),
-      transform = _useState6[0],
-      setTransform = _useState6[1];
+      dataURL = _useState6[0],
+      setDataURL = _useState6[1];
 
-  var _useState7 = (0, _react.useState)(false),
+  var _useState7 = (0, _react.useState)(""),
       _useState8 = _slicedToArray(_useState7, 2),
-      panning = _useState8[0],
-      setPanning = _useState8[1];
-
-  var _useState9 = (0, _react.useState)("default"),
-      _useState10 = _slicedToArray(_useState9, 2),
-      cursor = _useState10[0],
-      setCursor = _useState10[1];
-
-  var _useState11 = (0, _react.useState)(false),
-      _useState12 = _slicedToArray(_useState11, 2),
-      exporting = _useState12[0],
-      setExporting = _useState12[1];
-
-  var _useState13 = (0, _react.useState)(""),
-      _useState14 = _slicedToArray(_useState13, 2),
-      dataURL = _useState14[0],
-      setDataURL = _useState14[1];
-
-  var _useState15 = (0, _react.useState)(""),
-      _useState16 = _slicedToArray(_useState15, 2),
-      download = _useState16[0],
-      setDownload = _useState16[1];
+      download = _useState8[0],
+      setDownload = _useState8[1];
 
   (0, _react.useEffect)(function () {
     updateScale(zoom);
   }, [zoom]);
+  (0, _react.useEffect)(function () {
+    if (pan) {
+      setCursor("move");
+    }
+  }, [pan]);
 
   var updateScale = function updateScale(zoom) {
     if (!transformComponentRef.current) {
@@ -161,10 +146,10 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     return data;
   };
 
-  var _useState17 = (0, _react.useState)(datasource),
-      _useState18 = _slicedToArray(_useState17, 2),
-      ds = _useState18[0],
-      setDS = _useState18[1];
+  var _useState9 = (0, _react.useState)(datasource),
+      _useState10 = _slicedToArray(_useState9, 2),
+      ds = _useState10[0],
+      setDS = _useState10[1];
 
   (0, _react.useEffect)(function () {
     setDS(datasource);
@@ -178,85 +163,6 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       }
 
       _service.selectNodeService.clearSelectedNodeInfo();
-    }
-  };
-
-  var panEndHandler = function panEndHandler() {
-    setPanning(false);
-    setCursor("default");
-  };
-
-  var panHandler = function panHandler(e) {
-    var newX = 0;
-    var newY = 0;
-
-    if (!e.targetTouches) {
-      // pand on desktop
-      newX = e.pageX - startX;
-      newY = e.pageY - startY;
-    } else if (e.targetTouches.length === 1) {
-      // pan on mobile device
-      newX = e.targetTouches[0].pageX - startX;
-      newY = e.targetTouches[0].pageY - startY;
-    } else if (e.targetTouches.length > 1) {
-      return;
-    }
-
-    if (transform === "") {
-      if (transform.indexOf("3d") === -1) {
-        setTransform("matrix(1,0,0,1," + newX + "," + newY + ")");
-      } else {
-        setTransform("matrix3d(1,0,0,0,0,1,0,0,0,0,1,0," + newX + ", " + newY + ",0,1)");
-      }
-    } else {
-      var matrix = transform.split(",");
-
-      if (transform.indexOf("3d") === -1) {
-        matrix[4] = newX;
-        matrix[5] = newY + ")";
-      } else {
-        matrix[12] = newX;
-        matrix[13] = newY;
-      }
-
-      setTransform(matrix.join(","));
-    }
-  };
-
-  var panStartHandler = function panStartHandler(e) {
-    if (e.target.closest(".oc-node")) {
-      setPanning(false);
-      return;
-    } else {
-      setPanning(true);
-      setCursor("move");
-    }
-
-    var lastX = 0;
-    var lastY = 0;
-
-    if (transform !== "") {
-      var matrix = transform.split(",");
-
-      if (transform.indexOf("3d") === -1) {
-        lastX = parseInt(matrix[4]);
-        lastY = parseInt(matrix[5]);
-      } else {
-        lastX = parseInt(matrix[12]);
-        lastY = parseInt(matrix[13]);
-      }
-    }
-
-    if (!e.targetTouches) {
-      // pand on desktop
-      setStartX(e.pageX - lastX);
-      setStartY(e.pageY - lastY);
-    } else if (e.targetTouches.length === 1) {
-      // pan on mobile device
-      setStartX(e.targetTouches[0].pageX - lastX);
-      setStartY(e.targetTouches[0].pageY - lastY);
-    } else if (e.targetTouches.length > 1) {
-      return;
     }
   };
 
@@ -365,6 +271,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     disabled: !!!zoom,
     minScale: zoom && zoom.minZoom,
     maxScale: zoom && zoom.maxZoom,
+    limitToBounds: false,
     doubleClick: {
       disabled: true
     },
@@ -372,7 +279,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       disabled: true
     },
     panning: {
-      disabled: true
+      disabled: !pan
     }
   }, /*#__PURE__*/_react.default.createElement(_reactZoomPanPinch.TransformComponent, {
     wrapperClass: "transform-wrapper",
@@ -386,18 +293,14 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     }
   }, /*#__PURE__*/_react.default.createElement("div", {
     ref: container,
-    className: "orgchart-container " + containerClass,
-    onMouseUp: pan && panning ? panEndHandler : undefined
+    className: "orgchart-container " + containerClass
   }, /*#__PURE__*/_react.default.createElement("div", {
     ref: chart,
     className: "orgchart " + chartClass,
     style: {
-      transform: transform,
       cursor: cursor
     },
-    onClick: clickChartHandler,
-    onMouseDown: pan ? panStartHandler : undefined,
-    onMouseMove: pan && panning ? panHandler : undefined
+    onClick: clickChartHandler
   }, /*#__PURE__*/_react.default.createElement("ul", null, /*#__PURE__*/_react.default.createElement(_ChartNode.default, {
     datasource: attachRel(ds, "00"),
     NodeTemplate: NodeTemplate,
