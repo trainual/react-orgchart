@@ -268,7 +268,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   return /*#__PURE__*/_react.default.createElement(_reactZoomPanPinch.TransformWrapper, {
     initialScale: 1,
     ref: transformComponentRef,
-    disabled: !!!zoom,
+    disabled: !!!zoom && !pan,
     minScale: zoom && zoom.minZoom,
     maxScale: zoom && zoom.maxZoom,
     limitToBounds: false,

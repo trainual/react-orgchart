@@ -207,7 +207,7 @@ const ChartContainer = forwardRef(
       <TransformWrapper
         initialScale={1}
         ref={transformComponentRef}
-        disabled={!(!!zoom)}
+        disabled={!(!!zoom) && !pan}
         minScale={zoom && zoom.minZoom}
         maxScale={zoom && zoom.maxZoom}
         limitToBounds={false}
