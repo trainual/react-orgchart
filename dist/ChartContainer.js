@@ -78,6 +78,8 @@ var defaultProps = {
   collapsible: true,
   multipleSelect: false
 };
+var DEFAULT_ANIMATION_MS = 300;
+var DEFAULT_ANIMATION = 'easeOut';
 var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   var datasource = _ref.datasource,
       pan = _ref.pan,
@@ -133,9 +135,13 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       return;
     }
 
-    var centerView = transformComponentRef.current.centerView;
+    var _transformComponentRe = transformComponentRef.current,
+        state = _transformComponentRe.state,
+        setTransform = _transformComponentRe.setTransform;
+    var positionX = state.positionX,
+        positionY = state.positionY;
     var value = zoom.value;
-    centerView(value, 300, 'easeOut');
+    setTransform(positionX, positionY, value, DEFAULT_ANIMATION_MS, DEFAULT_ANIMATION);
   };
 
   var attachRel = function attachRel(data, flags) {

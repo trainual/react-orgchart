@@ -37,6 +37,9 @@ const defaultProps = {
   multipleSelect: false
 };
 
+const DEFAULT_ANIMATION_MS = 300;
+const DEFAULT_ANIMATION = 'easeOut';
+
 const ChartContainer = forwardRef(
   (
     {
@@ -83,10 +86,11 @@ const ChartContainer = forwardRef(
         return;
       }
 
-      const { centerView } = transformComponentRef.current;
+      const { state, setTransform } = transformComponentRef.current;
+      const { positionX, positionY } = state;
       const { value } = zoom;
 
-      centerView(value, 300, 'easeOut')
+      setTransform(positionX, positionY, value, DEFAULT_ANIMATION_MS, DEFAULT_ANIMATION);
     }
 
     const attachRel = (data, flags) => {
