@@ -65,6 +65,10 @@ const ChartContainer = forwardRef(
     const [download, setDownload] = useState("");
 
     useEffect(() => {
+      if (zoom === undefined) {
+        return;
+      }
+
       updateScale(zoom);
     }, [zoom]);
 

@@ -116,6 +116,10 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       setDownload = _useState8[1];
 
   (0, _react.useEffect)(function () {
+    if (zoom === undefined) {
+      return;
+    }
+
     updateScale(zoom);
   }, [zoom]);
   (0, _react.useEffect)(function () {
