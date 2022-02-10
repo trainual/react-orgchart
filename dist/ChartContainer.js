@@ -56,11 +56,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 var propTypes = {
   datasource: _propTypes.default.object.isRequired,
   pan: _propTypes.default.bool,
-  zoom: _propTypes.default.shape({
-    minZoom: _propTypes.default.number,
-    maxZoom: _propTypes.default.number,
-    value: _propTypes.default.number
-  }),
+  zoom: _propTypes.default.bool,
+  zoomAction: _propTypes.default.oneOf(['decrement', 'increment', 'reset']),
   containerClass: _propTypes.default.string,
   chartClass: _propTypes.default.string,
   NodeTemplate: _propTypes.default.elementType,
@@ -72,18 +69,18 @@ var propTypes = {
 };
 var defaultProps = {
   pan: false,
+  zoom: false,
   containerClass: "",
   chartClass: "",
   draggable: false,
   collapsible: true,
   multipleSelect: false
 };
-var DEFAULT_ANIMATION_MS = 300;
-var DEFAULT_ANIMATION = 'easeOut';
 var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   var datasource = _ref.datasource,
       pan = _ref.pan,
       zoom = _ref.zoom,
+      zoomAction = _ref.zoomAction,
       containerClass = _ref.containerClass,
       chartClass = _ref.chartClass,
       NodeTemplate = _ref.NodeTemplate,
@@ -118,31 +115,37 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       setDownload = _useState8[1];
 
   (0, _react.useEffect)(function () {
-    if (zoom === undefined) {
-      return;
-    }
-
-    updateScale(zoom);
-  }, [zoom]);
-  (0, _react.useEffect)(function () {
     if (pan) {
       setCursor("move");
     }
   }, [pan]);
 
-  var updateScale = function updateScale(zoom) {
+  var updateScale = function updateScale(zoomAction) {
     if (!transformComponentRef.current) {
       return;
     }
 
     var _transformComponentRe = transformComponentRef.current,
-        state = _transformComponentRe.state,
-        setTransform = _transformComponentRe.setTransform;
-    var positionX = state.positionX,
-        positionY = state.positionY;
-    var value = zoom.value;
-    setTransform(positionX, positionY, value, DEFAULT_ANIMATION_MS, DEFAULT_ANIMATION);
+        zoomIn = _transformComponentRe.zoomIn,
+        zoomOut = _transformComponentRe.zoomOut,
+        resetTransform = _transformComponentRe.resetTransform;
+
+    if (zoomAction === "decrement") {
+      zoomOut();
+    }
+
+    if (zoomAction === "increment") {
+      zoomIn();
+    }
+
+    if (zoomAction === "reset") {
+      resetTransform();
+    }
   };
+
+  if (zoom && zoomAction) {
+    updateScale(zoomAction);
+  }
 
   var attachRel = function attachRel(data, flags) {
     data.relationship = flags + (data.children && data.children.length > 0 ? 1 : 0);
@@ -278,15 +281,13 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
   return /*#__PURE__*/_react.default.createElement(_reactZoomPanPinch.TransformWrapper, {
     initialScale: 1,
     ref: transformComponentRef,
-    disabled: !!!zoom && !pan,
-    minScale: zoom && zoom.minZoom,
-    maxScale: zoom && zoom.maxZoom,
+    disabled: !zoom && !pan,
+    minScale: 0.25,
+    maxScale: 8,
     limitToBounds: false,
-    doubleClick: {
-      disabled: true
-    },
     wheel: {
-      disabled: true
+      step: 0.05,
+      disabled: false
     },
     panning: {
       disabled: !pan
@@ -298,6 +299,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
       minWidth: "100%"
     },
     contentStyle: {
+      minHeight: "100%",
       minWidth: "100%",
       display: "block"
     }

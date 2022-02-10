@@ -17,7 +17,8 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 const propTypes = {
   datasource: PropTypes.object.isRequired,
   pan: PropTypes.bool,
-  zoom: PropTypes.shape({ minZoom: PropTypes.number, maxZoom: PropTypes.number, value: PropTypes.number, }),
+  zoom: PropTypes.bool,
+  zoomAction: PropTypes.oneOf(['decrement', 'increment', 'reset']),
   containerClass: PropTypes.string,
   chartClass: PropTypes.string,
   NodeTemplate: PropTypes.elementType,
@@ -30,6 +31,7 @@ const propTypes = {
 
 const defaultProps = {
   pan: false,
+  zoom: false,
   containerClass: "",
   chartClass: "",
   draggable: false,
@@ -37,15 +39,13 @@ const defaultProps = {
   multipleSelect: false
 };
 
-const DEFAULT_ANIMATION_MS = 300;
-const DEFAULT_ANIMATION = 'easeOut';
-
 const ChartContainer = forwardRef(
   (
     {
       datasource,
       pan,
       zoom,
+      zoomAction,
       containerClass,
       chartClass,
       NodeTemplate,
@@ -68,29 +68,33 @@ const ChartContainer = forwardRef(
     const [download, setDownload] = useState("");
 
     useEffect(() => {
-      if (zoom === undefined) {
-        return;
-      }
-
-      updateScale(zoom);
-    }, [zoom]);
-
-    useEffect(() => {
       if (pan) {
         setCursor("move");
       }
     }, [pan]);
 
-    const updateScale = (zoom) => {
+    const updateScale = (zoomAction) => {
       if (!transformComponentRef.current) {
         return;
       }
 
-      const { state, setTransform } = transformComponentRef.current;
-      const { positionX, positionY } = state;
-      const { value } = zoom;
+      const { zoomIn, zoomOut, resetTransform } = transformComponentRef.current;
 
-      setTransform(positionX, positionY, value, DEFAULT_ANIMATION_MS, DEFAULT_ANIMATION);
+      if (zoomAction === "decrement") {
+        zoomOut();
+      }
+
+      if (zoomAction === "increment") {
+        zoomIn();
+      }
+
+      if (zoomAction === "reset") {
+        resetTransform();
+      }
+    }
+
+    if (zoom && zoomAction) {
+      updateScale(zoomAction);
     }
 
     const attachRel = (data, flags) => {
@@ -215,15 +219,13 @@ const ChartContainer = forwardRef(
       <TransformWrapper
         initialScale={1}
         ref={transformComponentRef}
-        disabled={!(!!zoom) && !pan}
-        minScale={zoom && zoom.minZoom}
-        maxScale={zoom && zoom.maxZoom}
+        disabled={!zoom && !pan}
+        minScale={0.25}
+        maxScale={8}
         limitToBounds={false}
-        doubleClick={{
-          disabled: true
-        }}
         wheel={{
-          disabled: true
+          step: 0.05,
+          disabled: false
         }}
         panning={{
           disabled: !pan
@@ -236,6 +238,7 @@ const ChartContainer = forwardRef(
             minWidth: "100%",
           }}
           contentStyle={{
+            minHeight: "100%",
             minWidth: "100%",
             display: "block",
           }}
