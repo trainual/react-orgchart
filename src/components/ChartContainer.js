@@ -247,7 +247,6 @@ const ChartContainer = forwardRef(
           contentStyle={{
             minHeight: "100%",
             minWidth: "100%",
-            display: "block",
           }}
         >
           <div ref={container} className={"orgchart-container " + containerClass}>

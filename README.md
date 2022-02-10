@@ -81,9 +81,15 @@
     </tr>
     <tr>
       <td>zoom</td>
-      <td>object</td>
+      <td>boolean</td>
+      <td>false</td>
+      <td>If true, the chart can be zoomed.</td>
+    </tr>
+    <tr>
+      <td>zoomAction</td>
+      <td>string</td>
       <td></td>
-      <td>ZoomState object and if set, the chart can be zoomed.</td>
+      <td>Will only work when zoom is set to true. Must be: 'decrement', 'increment', 'reset'</td>
     </tr>
   </tbody>
 </table>

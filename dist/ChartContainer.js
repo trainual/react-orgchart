@@ -308,8 +308,7 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     },
     contentStyle: {
       minHeight: "100%",
-      minWidth: "100%",
-      display: "block"
+      minWidth: "100%"
     }
   }, /*#__PURE__*/_react.default.createElement("div", {
     ref: container,
