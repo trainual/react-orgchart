@@ -80,16 +80,17 @@ const ChartContainer = forwardRef(
 
       const { zoomIn, zoomOut, resetTransform } = transformComponentRef.current;
 
-      if (zoomAction === "decrement") {
-        zoomOut();
-      }
-
-      if (zoomAction === "increment") {
-        zoomIn();
-      }
-
-      if (zoomAction === "reset") {
-        resetTransform();
+      // eslint-disable-next-line default-case
+      switch (zoomAction) {
+        case 'decrement':
+          zoomOut();
+          break;
+        case 'increment':
+          zoomIn();
+          break;
+        case 'reset':
+          resetTransform();
+          break;
       }
     }
 

@@ -128,18 +128,20 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     var _transformComponentRe = transformComponentRef.current,
         zoomIn = _transformComponentRe.zoomIn,
         zoomOut = _transformComponentRe.zoomOut,
-        resetTransform = _transformComponentRe.resetTransform;
+        resetTransform = _transformComponentRe.resetTransform; // eslint-disable-next-line default-case
 
-    if (zoomAction === "decrement") {
-      zoomOut();
-    }
+    switch (zoomAction) {
+      case 'decrement':
+        zoomOut();
+        break;
 
-    if (zoomAction === "increment") {
-      zoomIn();
-    }
+      case 'increment':
+        zoomIn();
+        break;
 
-    if (zoomAction === "reset") {
-      resetTransform();
+      case 'reset':
+        resetTransform();
+        break;
     }
   };
 
