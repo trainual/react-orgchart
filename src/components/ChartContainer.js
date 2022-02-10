@@ -224,12 +224,18 @@ const ChartContainer = forwardRef(
         minScale={0.25}
         maxScale={8}
         limitToBounds={false}
-        wheel={{
-          step: 0.05,
-          disabled: false
+        doubleClick={{
+          disabled: !zoom
         }}
         panning={{
           disabled: !pan
+        }}
+        pinch={{
+          disabled: !zoom
+        }}
+        wheel={{
+          step: 0.05,
+          disabled: !zoom
         }}
       >
         <TransformComponent

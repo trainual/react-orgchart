@@ -287,12 +287,18 @@ var ChartContainer = /*#__PURE__*/(0, _react.forwardRef)(function (_ref, ref) {
     minScale: 0.25,
     maxScale: 8,
     limitToBounds: false,
-    wheel: {
-      step: 0.05,
-      disabled: false
+    doubleClick: {
+      disabled: !zoom
     },
     panning: {
       disabled: !pan
+    },
+    pinch: {
+      disabled: !zoom
+    },
+    wheel: {
+      step: 0.05,
+      disabled: !zoom
     }
   }, /*#__PURE__*/_react.default.createElement(_reactZoomPanPinch.TransformComponent, {
     wrapperClass: "transform-wrapper",
