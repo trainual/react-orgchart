@@ -86,16 +86,10 @@
       <td>If true, the chart can be zoomed.</td>
     </tr>
     <tr>
-      <td>zoominLimit</td>
-      <td>number</td>
-      <td>7</td>
-      <td>User can zoom the chart at different scales(0.5~7).</td>
-    </tr>
-    <tr>
-      <td>zoomoutLimit</td>
-      <td>number</td>
-      <td>0.5</td>
-      <td>User can zoom the chart at different scales(0.5~7).</td>
+      <td>zoomAction</td>
+      <td>string</td>
+      <td></td>
+      <td>Will only work when zoom is set to true. Must be: 'decrement', 'increment', 'reset'</td>
     </tr>
   </tbody>
 </table>
@@ -127,7 +121,7 @@ Clone this repository:
 git clone git@github.com:trainual/react-orgchart.git
 ```
 
-###Install [yalc](https://github.com/wclr/yalc):
+### Install [yalc](https://github.com/wclr/yalc):
 
 Using NPM:
 ```
