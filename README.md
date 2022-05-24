@@ -1,3 +1,5 @@
+**DEPRECATED:** _This project has reached the end of its development_
+
 ![OrgChart](http://dabeng.github.io/OrgChart/img/heading.svg)
 
 ## Features
